@@ -1,13 +1,14 @@
+using LoginSimple.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LoginSimple
 {
@@ -24,7 +25,7 @@ namespace LoginSimple
         {
             services.AddDbContextPool<AppDbContext>(options =>
             {
-                options.UseSqlServer(_config.GetConnectionString("AirlineGameDBConnection"));
+                options.UseSqlServer(_config.GetConnectionString("LoginSimpleDBConnection"));
             });
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -50,6 +51,9 @@ namespace LoginSimple
 
             services.AddAuthorization(options =>
             {
+                options.AddPolicy("CreateRolePolicy", policy => policy.RequireClaim("Create Role", "true"));
+                options.AddPolicy("EditRolePolicy", policy => policy.RequireClaim("Edit Role", "true"));
+                options.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("Delete Role", "true"));
                 options.AddPolicy("AdministratorRolePolicy", policy => policy.RequireRole("Administrator"));
             });
 
